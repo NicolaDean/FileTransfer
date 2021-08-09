@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
 
@@ -14,11 +15,13 @@ public class Server {
     private ServerSocket        serverSocket;
 
     public Server() {
+        this.executor             = Executors.newCachedThreadPool();
         port = DefaultValues.port;
     }
 
     public Server(int port)
     {
+        this.executor             = Executors.newCachedThreadPool();
         this.port = port;
     }
 
@@ -28,6 +31,7 @@ public class Server {
     public void start()
     {
         this.serverSocketInitialization();
+        this.waitNewClient();
     }
 
     /**
@@ -49,6 +53,7 @@ public class Server {
     {
         while(true)
         {
+            System.out.println("Waiting client");
             acceptClient();
         }
     }
