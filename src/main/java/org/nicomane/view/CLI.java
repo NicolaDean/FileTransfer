@@ -1,4 +1,4 @@
-package org.example.view;
+package org.nicomane.view;
 
 public class CLI implements View{
 }
