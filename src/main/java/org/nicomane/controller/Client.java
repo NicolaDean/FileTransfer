@@ -1,5 +1,7 @@
 package org.nicomane.controller;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -41,17 +43,29 @@ public class Client implements Launcher {
         }
     }
 
+    public void readFile() throws FileNotFoundException {
+
+        File myObj = new File("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\AM12.pem");
+        Scanner myReader = new Scanner(myObj);
+        while (myReader.hasNextLine()) {
+            String data = myReader.nextLine();
+            this.output.println(data);
+        }
+        myReader.close();
+    }
+
     @Override
     public void start() {
         try {
             String ip = "192.168.1.143";
             int port = 1234;
 
+
             Socket s = new Socket(ip,port);
             initializeReader(s);
             initializeWriter(s);
 
-            output.println("BABBANOOOOO");
+            readFile();
             output.flush();
         } catch (IOException e) {
             e.printStackTrace();
