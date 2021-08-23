@@ -19,4 +19,8 @@ public class DefaultValues {
     public static String client_arg_2           = "-client";
     public static String server_arg_2           = "-server";
 
+    //TESING
+    public static String test_file_name         = "D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\partenza1.JPG";
+    public static String test_file_destination  = "D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\arrivo.JPG";
+
 }

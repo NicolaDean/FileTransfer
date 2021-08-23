@@ -1,5 +1,7 @@
 package org.nicomane.controller;
 
+import org.nicomane.utils.DefaultValues;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +34,7 @@ public class ClientHandler implements Runnable{
         FileOutputStream fos = null;
 
         try {
-             fos = new FileOutputStream("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\arrivo.JPG");
+             fos = new FileOutputStream(DefaultValues.test_file_destination);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -41,7 +43,7 @@ public class ClientHandler implements Runnable{
 
        // while(true)
        // {
-            byte[] buffer = new byte[8192]; // or 4096, or more
+            byte[] buffer = new byte[DefaultValues.defaultFileSegmentSize]; // or 4096, or more
             byte[] quit   = new byte[4];
             quit = "quit".getBytes(StandardCharsets.UTF_8);
             try{

@@ -1,11 +1,12 @@
 package org.nicomane.controller;
 
+import org.nicomane.utils.DefaultValues;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Scanner;
 
 public class Client implements Launcher {
 
@@ -44,32 +45,50 @@ public class Client implements Launcher {
         }
     }
 
-
-    public void readImage()
-    {
-
+    /**
+     * Send an array of byte through the network
+     * @param data          array of byte to send
+     * @throws IOException  if something goes wrong during the streaming of data
+     */
+    public void sendByteThroughSocket(byte[] data) throws IOException {
+        this.output.write(data);
+        this.output.flush();
     }
 
-    public void readVideo()
-    {
+    /**
+     * Send a specified file through network as a byte array stream of a fixed size packets
+     * @param filePath      path of file to send
+     * @throws IOException  if something goes wrong during the streaming of data
+     */
+    public void sendFileData(String filePath) throws IOException {
 
+        byte[] data = readFile(filePath);
+        this.sendByteThroughSocket(data);
     }
 
-    public void readFile() throws IOException {
+    public void sendFileDataFixed(String filePath) throws IOException {
+        BufferedReader reader =  new BufferedReader(new FileReader(filePath));
 
-        File myObj = new File("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\0d6730a87776461f171f85ba791ca768.pdf");
-        Scanner myReader = new Scanner(myObj);
-        byte[] array = Files.readAllBytes(Paths.get("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\partenza1.JPG"));
-        /*while (myReader.hasNextLine()) {
-            String data = myReader.nextLine();
-            this.output.println(data);
-        }*/
+        int count;
+        byte[] buffer = new byte[DefaultValues.defaultFileSegmentSize]; // or 4096, or more
 
-        this.output.write(array);
-        this.output.flush();
-        this.output.write("quit".getBytes(StandardCharsets.UTF_8));
-        this.output.flush();
-        myReader.close();
+        while((count = this.input.read(buffer)) > 0)
+        {
+            this.output.write(buffer);
+        }
+        reader.close();
+    }
+
+    /**
+     * Read a file and convert it into a byte array
+     * @param filePath file to read
+     * @return an array of bytes
+     * @throws IOException if something goes wrong during the load of files or conversion
+     */
+    public byte[] readFile(String filePath) throws IOException
+    {
+        byte[] data = Files.readAllBytes(Paths.get(filePath));
+        return data;
     }
 
     @Override
@@ -78,16 +97,11 @@ public class Client implements Launcher {
             String ip = "192.168.1.143";
             int port = 1234;
 
-
             Socket s = new Socket(ip,port);
             initializeReader(s);
             initializeWriter(s);
 
-            readFile();
-            output.flush();
-
-            output.write("\n".getBytes(StandardCharsets.UTF_8));
-            output.write("quit".getBytes(StandardCharsets.UTF_8));
+            sendFileData(DefaultValues.test_file_name);
             output.flush();
         } catch (IOException e) {
             e.printStackTrace();
