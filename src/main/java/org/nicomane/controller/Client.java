@@ -1,16 +1,16 @@
 package org.nicomane.controller;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Client implements Launcher {
 
-    private Scanner         input;
-    private PrintWriter     output;
+    private DataInputStream         input;
+    private OutputStream    output;
 
     public Client(){
     }
@@ -24,7 +24,8 @@ public class Client implements Launcher {
     public void initializeReader(Socket s)
     {
         try {
-            this.input  = new Scanner(s.getInputStream());
+            this.input = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+            //this.input  = new Scanner(s.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,20 +38,37 @@ public class Client implements Launcher {
     public void initializeWriter(Socket s)
     {
         try {
-            this.output = new PrintWriter(s.getOutputStream());
+            this.output = s.getOutputStream();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void readFile() throws FileNotFoundException {
 
-        File myObj = new File("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\AM12.pem");
+    public void readImage()
+    {
+
+    }
+
+    public void readVideo()
+    {
+
+    }
+
+    public void readFile() throws IOException {
+
+        File myObj = new File("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\0d6730a87776461f171f85ba791ca768.pdf");
         Scanner myReader = new Scanner(myObj);
-        while (myReader.hasNextLine()) {
+        byte[] array = Files.readAllBytes(Paths.get("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\partenza1.JPG"));
+        /*while (myReader.hasNextLine()) {
             String data = myReader.nextLine();
             this.output.println(data);
-        }
+        }*/
+
+        this.output.write(array);
+        this.output.flush();
+        this.output.write("quit".getBytes(StandardCharsets.UTF_8));
+        this.output.flush();
         myReader.close();
     }
 
@@ -66,6 +84,10 @@ public class Client implements Launcher {
             initializeWriter(s);
 
             readFile();
+            output.flush();
+
+            output.write("\n".getBytes(StandardCharsets.UTF_8));
+            output.write("quit".getBytes(StandardCharsets.UTF_8));
             output.flush();
         } catch (IOException e) {
             e.printStackTrace();

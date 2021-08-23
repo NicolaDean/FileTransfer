@@ -1,8 +1,9 @@
 package org.nicomane.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Scanner;
 public class ClientHandler implements Runnable{
 
     private Socket          clientSocket;
-    private Scanner         input;
+    private DataInputStream input;
     private PrintWriter     output;
 
     private Object          lock;
@@ -28,17 +29,63 @@ public class ClientHandler implements Runnable{
 
     @Override
     public void run() {
+        FileOutputStream fos = null;
 
-        while(true)
-        {
-            String message = this.input.nextLine();
-            if (message.equals("quit")) {
+        try {
+             fos = new FileOutputStream("D:\\FileTransferServer\\src\\main\\java\\org\\nicomane\\arrivo.JPG");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+
+       // while(true)
+       // {
+            byte[] buffer = new byte[8192]; // or 4096, or more
+            byte[] quit   = new byte[4];
+            quit = "quit".getBytes(StandardCharsets.UTF_8);
+            try{
+                int count;
+                while ((count = this.input.read(buffer)) > 0)
+                {
+                    fos.write(buffer, 0, count);
+                    System.out.println(buffer.toString() + " -> " + count);
+                    fos.flush();
+
+                    if(Arrays.equals(buffer, quit))
+                    {
+                        System.out.println(buffer + " -> " + count);
+                        System.out.println("QUIIIT");
+                    }
+                }
+                fos.close();
+            }catch (Exception e)
+            {
+                System.out.println(e.getMessage());
+            }
+
+            /*if (message.equals("quit")) {
                 System.out.println("Client " + clientSocket.getInetAddress() + " Exited the server");
+
+                try {
+                    fos.close();
+                    fos.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             } else {
                 System.out.println("MSG: " + message);
-            }
-        }
+                message = message + "\n";
+                try {
+                    fos.write(message.getBytes(StandardCharsets.UTF_8));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }*/
+        //}
+
     }
 
     public void waitMessage()
@@ -72,7 +119,8 @@ public class ClientHandler implements Runnable{
     public void initializeReader(Socket s)
     {
         try {
-            this.input  = new Scanner(s.getInputStream());
+            //this.input  = new Scanner(s.getInputStream());
+            this.input = new DataInputStream(new BufferedInputStream(s.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
         }
